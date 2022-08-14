@@ -1,14 +1,14 @@
 [package]
 name = "bezier-rs"
-publish = false
-version = "0.0.0"
-rust-version = "1.56.0"
-authors = ["Bezier-rs Authors"]
+version = "0.1.0"
+rust-version = "1.62.0"
 edition = "2021"
-readme = "./README.md"
-homepage = "https://github.com/Keavon/Bezier-rs"
-repository = "https://github.com/Keavon/Bezier-rs"
+authors = ["Bezier-rs Authors"]
+description = "A wide assortment of useful math functions for Bezier segments and shapes."
 license = "MIT OR Apache-2.0"
+readme = "./README.md"
+homepage = "https://keavon.github.io/Bezier-rs"
+repository = "https://github.com/Keavon/Bezier-rs/libraries/bezier-rs"
 
 [dependencies]
 glam = { version = "0.17", features = ["serde"] }
