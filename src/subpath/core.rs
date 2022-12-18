@@ -51,7 +51,7 @@ impl Subpath {
 	}
 
 	/// Returns an iterator of the [Bezier]s along the `Subpath`.
-	pub fn iter(&self) -> SubpathIter {
+	pub fn iter(&self) -> SubpathIter<'_> {
 		SubpathIter { sub_path: self, index: 0 }
 	}
 
