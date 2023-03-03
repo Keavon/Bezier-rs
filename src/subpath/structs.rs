@@ -92,3 +92,9 @@ impl<ManipulatorGroupId: crate::Identifier> ManipulatorGroup<ManipulatorGroupId>
 		self.out_handle = self.out_handle.map(|out_handle| affine_transform.transform_point2(out_handle));
 	}
 }
+
+#[derive(Copy, Clone)]
+pub enum AppendType {
+	IgnoreStart,
+	SmoothJoin(f64),
+}
