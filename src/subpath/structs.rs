@@ -45,7 +45,7 @@ impl<ManipulatorGroupId: crate::Identifier> Hash for ManipulatorGroup<Manipulato
 }
 
 #[cfg(feature = "dyn-any")]
-impl<ManipulatorGroupId: crate::Identifier> dyn_any::StaticType for ManipulatorGroup<ManipulatorGroupId> {
+unsafe impl<ManipulatorGroupId: crate::Identifier> dyn_any::StaticType for ManipulatorGroup<ManipulatorGroupId> {
 	type Static = ManipulatorGroup<ManipulatorGroupId>;
 }
 

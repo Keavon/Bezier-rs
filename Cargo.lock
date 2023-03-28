@@ -4,7 +4,18 @@ version = 3
 
 [[package]]
 name = "bezier-rs"
-version = "0.1.1"
+version = "0.2.1"
+dependencies = [
+ "dyn-any",
+ "glam",
+ "serde",
+]
+
+[[package]]
+name = "dyn-any"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b40ae707838b3e3f687b13f61e06cdcdc19f41f5cdfc8cfacc94bb7b8112f295"
 dependencies = [
  "glam",
 ]
