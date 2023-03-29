@@ -1,5 +1,3 @@
-const webpackConfigPath = require.resolve("@vue/cli-service/webpack.config.js");
-
 module.exports = {
 	root: true,
 	env: {
@@ -12,14 +10,6 @@ module.exports = {
 		// parser: '@typescript-eslint/parser'
 	},
 	extends: [
-		// Vue-specific defaults
-		"plugin:vue/vue3-essential",
-		// Vue-compatible JS defaults
-		"@vue/airbnb",
-		// Vue-compatible TS defaults
-		"@vue/typescript/recommended",
-		// Vue-compatible Prettier defaults
-		"plugin:prettier-vue/recommended",
 		// General Prettier defaults
 		"prettier",
 	],
@@ -28,16 +18,6 @@ module.exports = {
 		"import/resolver": {
 			// `node` must be listed first!
 			node: {},
-			webpack: { config: webpackConfigPath },
-		},
-		// https://github.com/meteorlxy/eslint-plugin-prettier-vue
-		"prettier-vue": {
-			// Use Prettier to format the HTML, CSS, and JS blocks of .vue single-file components
-			SFCBlocks: {
-				template: true,
-				style: true,
-				script: true,
-			},
 		},
 	},
 	ignorePatterns: [
@@ -85,14 +65,7 @@ module.exports = {
 					caseInsensitive: true,
 				},
 				warnOnUnassignedImports: true,
-				"newlines-between": "always-and-inside-groups",
-				pathGroups: [
-					{
-						pattern: "**/*.vue",
-						group: "unknown",
-						position: "after",
-					},
-				],
+				"newlines-between": "always-and-inside-groups"
 			},
 		],
 
