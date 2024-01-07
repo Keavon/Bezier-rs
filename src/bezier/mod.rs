@@ -1,6 +1,7 @@
 mod core;
 mod lookup;
 mod manipulators;
+mod poly_cool;
 mod solvers;
 mod structs;
 mod transform;

@@ -1,6 +1,6 @@
 [package]
 name = "bezier-rs"
-version = "0.2.1"
+version = "0.3.1"
 rust-version = "1.66.0"
 edition = "2021"
 authors = ["Bezier-rs Authors"]
@@ -12,6 +12,9 @@ categories = ["graphics", "mathematics"]
 homepage = "https://github.com/Keavon/Bezier-rs"
 repository = "https://github.com/Keavon/Bezier-rs"
 documentation = "https://keavon.github.io/Bezier-rs/"
+
+[features]
+std = ["glam/std"]
 
 [dependencies]
 glam = { version = "0.24", features = ["serde"] }
