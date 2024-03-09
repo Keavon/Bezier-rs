@@ -1,4 +1,4 @@
-use crate::utils::{f64_compare, TValue, TValueType};
+use crate::utils::{TValue, TValueType};
 
 use super::*;
 
@@ -21,44 +21,57 @@ impl Bezier {
 			return 1.;
 		}
 
-		let mut low = 0.;
-		let mut mid = 0.5;
-		let mut high = 1.;
+		match self.handles {
+			BezierHandles::Linear => euclidean_t,
+			BezierHandles::Quadratic { handle } => {
+				// Use Casteljau subdivision, noting that the length is more than the straight line distance from start to end but less than the straight line distance through the handles
+				fn recurse(a0: DVec2, a1: DVec2, a2: DVec2, level: u8, desired_len: f64) -> (f64, f64) {
+					let lower = a0.distance(a2);
+					let upper = a0.distance(a1) + a1.distance(a2);
+					if level >= 8 {
+						let approx_len = (lower + upper) / 2.;
+						return (approx_len, desired_len / approx_len);
+					}
 
-		// The euclidean t-value input generally correlates with the parametric t-value result.
-		// So we can assume a low t-value has a short length from the start of the curve, and a high t-value has a short length from the end of the curve.
-		// We'll use a strategy where we measure from either end of the curve depending on which side is closer than thus more likely to be proximate to the sought parametric t-value.
-		// This allows us to use fewer segments to approximate the curve, which usually won't go much beyond half the curve.
-		let result_likely_closer_to_start = euclidean_t < 0.5;
-		// If the curve is near either end, we need even fewer segments to approximate the curve with reasonable accuracy.
-		// A point that's likely near the center is the worst case where we need to use up to half the predefined number of max subdivisions.
-		let subdivisions_proportional_to_likely_length = ((euclidean_t - 0.5).abs() * DEFAULT_LENGTH_SUBDIVISIONS as f64).round().max(1.) as usize;
+					let b1 = 0.5 * (a0 + a1);
+					let c1 = 0.5 * (a1 + a2);
+					let b2 = 0.5 * (b1 + c1);
+					let (first_len, t) = recurse(a0, b1, b2, level + 1, desired_len);
+					if first_len > desired_len {
+						return (first_len, t * 0.5);
+					}
+					let (second_len, t) = recurse(b2, c1, a2, level + 1, desired_len - first_len);
+					(first_len + second_len, t * 0.5 + 0.5)
+				}
+				recurse(self.start, handle, self.end, 0, total_length * euclidean_t).1
+			}
+			BezierHandles::Cubic { handle_start, handle_end } => {
+				// Use Casteljau subdivision, noting that the length is more than the straight line distance from start to end but less than the straight line distance through the handles
+				fn recurse(a0: DVec2, a1: DVec2, a2: DVec2, a3: DVec2, level: u8, desired_len: f64) -> (f64, f64) {
+					let lower = a0.distance(a3);
+					let upper = a0.distance(a1) + a1.distance(a2) + a2.distance(a3);
+					if level >= 8 {
+						let approx_len = (lower + upper) / 2.;
+						return (approx_len, desired_len / approx_len);
+					}
 
-		// Binary search for the parametric t-value that corresponds to the euclidean distance ratio by trimming the curve between the start and the tested parametric t-value during each iteration of the search.
-		while low < high {
-			mid = (low + high) / 2.;
-
-			// We can search from the curve start to the sought point, or from the sought point to the curve end, depending on which side is likely closer to the result.
-			let current_length = if result_likely_closer_to_start {
-				let trimmed = self.trim(TValue::Parametric(0.), TValue::Parametric(mid));
-				trimmed.length(Some(subdivisions_proportional_to_likely_length))
-			} else {
-				let trimmed = self.trim(TValue::Parametric(mid), TValue::Parametric(1.));
-				let trimmed_length = trimmed.length(Some(subdivisions_proportional_to_likely_length));
-				total_length - trimmed_length
-			};
-			let current_euclidean_t = current_length / total_length;
-
-			if f64_compare(current_euclidean_t, euclidean_t, error) {
-				break;
-			} else if current_euclidean_t < euclidean_t {
-				low = mid;
-			} else {
-				high = mid;
+					let b1 = 0.5 * (a0 + a1);
+					let t0 = 0.5 * (a1 + a2);
+					let c1 = 0.5 * (a2 + a3);
+					let b2 = 0.5 * (b1 + t0);
+					let c2 = 0.5 * (t0 + c1);
+					let b3 = 0.5 * (b2 + c2);
+					let (first_len, t) = recurse(a0, b1, b2, b3, level + 1, desired_len);
+					if first_len > desired_len {
+						return (first_len, t * 0.5);
+					}
+					let (second_len, t) = recurse(b3, c2, c1, a3, level + 1, desired_len - first_len);
+					(first_len + second_len, t * 0.5 + 0.5)
+				}
+				recurse(self.start, handle_start, handle_end, self.end, 0, total_length * euclidean_t).1
 			}
 		}
-
-		mid
+		.clamp(0., 1.)
 	}
 
 	/// Convert a [TValue] to a parametric `t`-value.
@@ -109,44 +122,66 @@ impl Bezier {
 	/// Return a selection of equidistant points on the bezier curve.
 	/// If no value is provided for `steps`, then the function will default `steps` to be 10.
 	/// <iframe frameBorder="0" width="100%" height="350px" src="https://keavon.github.io/Bezier-rs#bezier/lookup-table/solo" title="Lookup-Table Demo"></iframe>
-	pub fn compute_lookup_table(&self, steps: Option<usize>, tvalue_type: Option<TValueType>) -> Vec<DVec2> {
+	pub fn compute_lookup_table(&self, steps: Option<usize>, tvalue_type: Option<TValueType>) -> impl Iterator<Item = DVec2> + '_ {
 		let steps = steps.unwrap_or(DEFAULT_LUT_STEP_SIZE);
 		let tvalue_type = tvalue_type.unwrap_or(TValueType::Parametric);
 
-		(0..=steps)
-			.map(|t| {
-				let tvalue = match tvalue_type {
-					TValueType::Parametric => TValue::Parametric(t as f64 / steps as f64),
-					TValueType::Euclidean => TValue::Euclidean(t as f64 / steps as f64),
-				};
-				self.evaluate(tvalue)
-			})
-			.collect()
+		(0..=steps).map(move |t| {
+			let tvalue = match tvalue_type {
+				TValueType::Parametric => TValue::Parametric(t as f64 / steps as f64),
+				TValueType::Euclidean => TValue::Euclidean(t as f64 / steps as f64),
+			};
+			self.evaluate(tvalue)
+		})
 	}
 
 	/// Return an approximation of the length of the bezier curve.
-	/// - `num_subdivisions` - Number of subdivisions used to approximate the curve. The default value is 1000.
+	/// - `tolerance` - Tolerance used to approximate the curve.
 	/// <iframe frameBorder="0" width="100%" height="300px" src="https://keavon.github.io/Bezier-rs#bezier/length/solo" title="Length Demo"></iframe>
-	pub fn length(&self, num_subdivisions: Option<usize>) -> f64 {
+	pub fn length(&self, tolerance: Option<f64>) -> f64 {
 		match self.handles {
 			BezierHandles::Linear => (self.start - self.end).length(),
-			_ => {
-				// Code example from <https://gamedev.stackexchange.com/questions/5373/moving-ships-between-two-planets-along-a-bezier-missing-some-equations-for-acce/5427#5427>.
+			BezierHandles::Quadratic { handle } => {
+				// Use Casteljau subdivision, noting that the length is more than the straight line distance from start to end but less than the straight line distance through the handles
+				fn recurse(a0: DVec2, a1: DVec2, a2: DVec2, tolerance: f64, level: u8) -> f64 {
+					let lower = a0.distance(a2);
+					let upper = a0.distance(a1) + a1.distance(a2);
+					if upper - lower <= 2. * tolerance || level >= 8 {
+						return (lower + upper) / 2.;
+					}
 
-				// We will use an approximate approach where we split the curve into many subdivisions
-				// and calculate the euclidean distance between the two endpoints of the subdivision
-				let lookup_table = self.compute_lookup_table(Some(num_subdivisions.unwrap_or(DEFAULT_LENGTH_SUBDIVISIONS)), Some(TValueType::Parametric));
-				let approx_curve_length: f64 = lookup_table.windows(2).map(|points| (points[1] - points[0]).length()).sum();
+					let b1 = 0.5 * (a0 + a1);
+					let c1 = 0.5 * (a1 + a2);
+					let b2 = 0.5 * (b1 + c1);
+					recurse(a0, b1, b2, 0.5 * tolerance, level + 1) + recurse(b2, c1, a2, 0.5 * tolerance, level + 1)
+				}
+				recurse(self.start, handle, self.end, tolerance.unwrap_or_default(), 0)
+			}
+			BezierHandles::Cubic { handle_start, handle_end } => {
+				// Use Casteljau subdivision, noting that the length is more than the straight line distance from start to end but less than the straight line distance through the handles
+				fn recurse(a0: DVec2, a1: DVec2, a2: DVec2, a3: DVec2, tolerance: f64, level: u8) -> f64 {
+					let lower = a0.distance(a3);
+					let upper = a0.distance(a1) + a1.distance(a2) + a2.distance(a3);
+					if upper - lower <= 2. * tolerance || level >= 8 {
+						return (lower + upper) / 2.;
+					}
 
-				approx_curve_length
+					let b1 = 0.5 * (a0 + a1);
+					let t0 = 0.5 * (a1 + a2);
+					let c1 = 0.5 * (a2 + a3);
+					let b2 = 0.5 * (b1 + t0);
+					let c2 = 0.5 * (t0 + c1);
+					let b3 = 0.5 * (b2 + c2);
+					recurse(a0, b1, b2, b3, 0.5 * tolerance, level + 1) + recurse(b3, c2, c1, a3, 0.5 * tolerance, level + 1)
+				}
+				recurse(self.start, handle_start, handle_end, self.end, tolerance.unwrap_or_default(), 0)
 			}
 		}
 	}
 
 	/// Returns the parametric `t`-value that corresponds to the closest point on the curve to the provided point.
-	/// Uses a searching algorithm akin to binary search that can be customized using the optional [ProjectionOptions] struct.
 	/// <iframe frameBorder="0" width="100%" height="300px" src="https://keavon.github.io/Bezier-rs#bezier/project/solo" title="Project Demo"></iframe>
-	pub fn project(&self, point: DVec2, options: Option<ProjectionOptions>) -> f64 {
+	pub fn project(&self, point: DVec2) -> f64 {
 		// The points at which the line from us to `point` is perpendicular
 		// to our curve are the critical points of the distance function.
 		let critical = self.normals_to_point(point);
@@ -189,11 +224,11 @@ mod tests {
 	#[test]
 	fn test_compute_lookup_table() {
 		let bezier1 = Bezier::from_quadratic_coordinates(10., 10., 30., 30., 50., 10.);
-		let lookup_table1 = bezier1.compute_lookup_table(Some(2), Some(TValueType::Parametric));
+		let lookup_table1 = bezier1.compute_lookup_table(Some(2), Some(TValueType::Parametric)).collect::<Vec<_>>();
 		assert_eq!(lookup_table1, vec![bezier1.start(), bezier1.evaluate(TValue::Parametric(0.5)), bezier1.end()]);
 
 		let bezier2 = Bezier::from_cubic_coordinates(10., 10., 30., 30., 70., 70., 90., 10.);
-		let lookup_table2 = bezier2.compute_lookup_table(Some(4), Some(TValueType::Parametric));
+		let lookup_table2 = bezier2.compute_lookup_table(Some(4), Some(TValueType::Parametric)).collect::<Vec<_>>();
 		assert_eq!(
 			lookup_table2,
 			vec![
@@ -226,14 +261,14 @@ mod tests {
 	#[test]
 	fn test_project() {
 		let bezier1 = Bezier::from_cubic_coordinates(4., 4., 23., 45., 10., 30., 56., 90.);
-		assert_eq!(bezier1.project(DVec2::ZERO, None), 0.);
-		assert_eq!(bezier1.project(DVec2::new(100., 100.), None), 1.);
+		assert_eq!(bezier1.project(DVec2::ZERO), 0.);
+		assert_eq!(bezier1.project(DVec2::new(100., 100.)), 1.);
 
 		let bezier2 = Bezier::from_quadratic_coordinates(0., 0., 0., 100., 100., 100.);
-		assert_eq!(bezier2.project(DVec2::new(99.99, 0.), None), 0.);
-		assert!((bezier2.project(DVec2::new(-50., 150.), None) - 0.5).abs() <= 1e-8);
+		assert_eq!(bezier2.project(DVec2::new(99.99, 0.)), 0.);
+		assert!((bezier2.project(DVec2::new(-50., 150.)) - 0.5).abs() <= 1e-8);
 
 		let bezier3 = Bezier::from_cubic_coordinates(-50., -50., -50., -50., 50., -50., 50., -50.);
-		assert_eq!(DVec2::new(0., -50.), bezier3.evaluate(TValue::Parametric(bezier3.project(DVec2::new(0., -50.), None))));
+		assert_eq!(DVec2::new(0., -50.), bezier3.evaluate(TValue::Parametric(bezier3.project(DVec2::new(0., -50.)))));
 	}
 }
