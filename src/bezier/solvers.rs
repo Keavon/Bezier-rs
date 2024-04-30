@@ -1,4 +1,5 @@
 use super::*;
+use crate::polynomial::Polynomial;
 use crate::utils::{solve_cubic, solve_quadratic, TValue};
 
 use glam::DMat2;
@@ -30,6 +31,31 @@ impl Bezier {
 		}
 
 		de_casteljau_points
+	}
+
+	/// Returns two [`Polynomial`]s representing the parametric equations for x and y coordinates of the bezier curve respectively.
+	/// The domain of both the equations are from t=0.0 representing the start and t=1.0 representing the end of the bezier curve.
+	pub fn parametric_polynomial(&self) -> (Polynomial<4>, Polynomial<4>) {
+		match self.handles {
+			BezierHandles::Linear => {
+				let term1 = self.end - self.start;
+
+				(Polynomial::new([self.start.x, term1.x, 0., 0.]), Polynomial::new([self.start.y, term1.y, 0., 0.]))
+			}
+			BezierHandles::Quadratic { handle } => {
+				let term1 = 2. * (handle - self.start);
+				let term2 = self.start - 2. * handle + self.end;
+
+				(Polynomial::new([self.start.x, term1.x, term2.x, 0.]), Polynomial::new([self.start.y, term1.y, term2.y, 0.]))
+			}
+			BezierHandles::Cubic { handle_start, handle_end } => {
+				let term1 = 3. * (handle_start - self.start);
+				let term2 = 3. * (handle_end - handle_start) - term1;
+				let term3 = self.end - self.start - term2 - term1;
+
+				(Polynomial::new([self.start.x, term1.x, term2.x, term3.x]), Polynomial::new([self.start.y, term1.y, term2.y, term3.y]))
+			}
+		}
 	}
 
 	/// Returns a [Bezier] representing the derivative of the original curve.
