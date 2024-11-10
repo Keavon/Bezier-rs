@@ -366,10 +366,14 @@ impl<PointId: crate::Identifier> Subpath<PointId> {
 	}
 }
 
+/// Solve for the first handle of an open spline. (The opposite handle can be found by mirroring the result about the anchor.)
 pub fn solve_spline_first_handle_open(points: &[DVec2]) -> Vec<DVec2> {
 	let len_points = points.len();
 	if len_points == 0 {
 		return Vec::new();
+	}
+	if len_points == 1 {
+		return vec![points[0]];
 	}
 
 	// Matrix coefficients a, b and c (see https://mathworld.wolfram.com/CubicSpline.html).
@@ -418,6 +422,8 @@ pub fn solve_spline_first_handle_open(points: &[DVec2]) -> Vec<DVec2> {
 	d
 }
 
+/// Solve for the first handle of a closed spline. (The opposite handle can be found by mirroring the result about the anchor.)
+/// If called with fewer than 3 points, this function will return an empty result.
 pub fn solve_spline_first_handle_closed(points: &[DVec2]) -> Vec<DVec2> {
 	let len_points = points.len();
 	if len_points < 3 {
@@ -426,9 +432,9 @@ pub fn solve_spline_first_handle_closed(points: &[DVec2]) -> Vec<DVec2> {
 
 	// Matrix coefficients `a`, `b` and `c` (see https://mathworld.wolfram.com/CubicSpline.html).
 	// We don't really need to allocate them but it keeps the maths understandable.
-	let a = vec![DVec2::splat(1.); len_points];
+	let a = vec![DVec2::ONE; len_points];
 	let b = vec![DVec2::splat(4.); len_points];
-	let c = vec![DVec2::splat(1.); len_points];
+	let c = vec![DVec2::ONE; len_points];
 
 	let mut cmod = vec![DVec2::ZERO; len_points];
 	let mut u = vec![DVec2::ZERO; len_points];
