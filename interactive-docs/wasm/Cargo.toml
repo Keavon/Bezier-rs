@@ -2,9 +2,9 @@
 name = "bezier-rs-wasm"
 publish = false
 version = "0.0.0"
-rust-version = "1.79"
+rust-version = "1.85"
 authors = ["Bezier-rs Authors"]
-edition = "2021"
+edition = "2024"
 readme = "../README.md"
 homepage = "https://github.com/Keavon/Bezier-rs"
 repository = "https://github.com/Keavon/Bezier-rs"
