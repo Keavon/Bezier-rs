@@ -45,11 +45,6 @@ impl<PointId: crate::Identifier> Hash for ManipulatorGroup<PointId> {
 	}
 }
 
-#[cfg(feature = "dyn-any")]
-unsafe impl<PointId: crate::Identifier> dyn_any::StaticType for ManipulatorGroup<PointId> {
-	type Static = ManipulatorGroup<PointId>;
-}
-
 impl<PointId: crate::Identifier> Debug for ManipulatorGroup<PointId> {
 	fn fmt(&self, f: &mut Formatter<'_>) -> Result {
 		f.debug_struct("ManipulatorGroup")

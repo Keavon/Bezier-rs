@@ -21,6 +21,6 @@ std = ["glam/std"]
 glam = { version = "0.29", features = ["serde"] }
 poly-cool = { version = "0.2" }
 
-dyn-any = { version = "0.3.1", optional = true }
+# Optional dependencies
 serde = { version = "1.0", features = ["derive"], optional = true }
 kurbo = { version = "0.11", optional = true }

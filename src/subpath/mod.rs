@@ -19,11 +19,6 @@ pub struct Subpath<PointId: crate::Identifier> {
 	pub closed: bool,
 }
 
-#[cfg(feature = "dyn-any")]
-unsafe impl<PointId: crate::Identifier> dyn_any::StaticType for Subpath<PointId> {
-	type Static = Subpath<PointId>;
-}
-
 /// Iteration structure for iterating across each curve of a `Subpath`, using an intermediate `Bezier` representation.
 pub struct SubpathIter<'a, PointId: crate::Identifier> {
 	index: usize,
