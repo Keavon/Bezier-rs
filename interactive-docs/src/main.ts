@@ -59,7 +59,7 @@ function renderPage() {
 		<p class="website-description">
 			This is the interactive documentation for the <a href="https://crates.io/crates/bezier-rs">Bezier-rs</a> library. View the
 			<a href="https://docs.rs/bezier-rs/latest/bezier_rs">crate documentation</a>
-			for detailed function descriptions and API usage. Click and drag on the endpoints of the demo curves to visualize the various Bezier utilities and functions.
+			for detailed API usage descriptions. Click and drag the curve anchors and handles to visualize the available algorithms.
 		</p>
 		
 		<h2 class="category-header">Beziers</h2>
