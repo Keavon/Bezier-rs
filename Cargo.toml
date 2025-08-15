@@ -1,6 +1,6 @@
 [package]
 name = "bezier-rs"
-version = "0.4.1"
+version = "0.5.0"
 rust-version = "1.85"
 edition = "2024"
 authors = ["Bezier-rs Authors"]
