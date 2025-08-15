@@ -1,10 +1,20 @@
 import type { SubpathCallback, SubpathInputOption, WasmSubpathInstance } from "@/types";
-import { capOptions, joinOptions, tSliderOptions, subpathTValueVariantOptions, intersectionErrorOptions, minimumSeparationOptions, separationDiskDiameter, SUBPATH_T_VALUE_VARIANTS } from "@/types";
+import { boolOptions, capOptions, joinOptions, tSliderOptions, subpathTValueVariantOptions, intersectionErrorOptions, minimumSeparationOptions, separationDiskDiameter, SUBPATH_T_VALUE_VARIANTS } from "@/types";
 
 const subpathFeatures = {
 	constructor: {
 		name: "Constructor",
 		callback: (subpath: WasmSubpathInstance): string => subpath.to_svg(),
+	},
+	"new-cubic-spline": {
+		name: "New Cubic Spline",
+		callback: (subpath: WasmSubpathInstance, options: Record<string, number>): string => subpath.new_cubic_spline(options.closed),
+		inputOptions: [
+			{
+				...boolOptions,
+				variable: "closed",
+			}
+		],
 	},
 	insert: {
 		name: "Insert",

@@ -105,6 +105,7 @@ export const SUBPATH_T_VALUE_VARIANTS = ["GlobalParametric", "GlobalEuclidean"] 
 
 const CAP_VARIANTS = ["Butt", "Round", "Square"] as const;
 const JOIN_VARIANTS = ["Bevel", "Miter", "Round"] as const;
+const BOOL_VARIANTS = ["false", "true"] as const;
 
 export const POINT_INDEX_TO_MANIPULATOR: WasmSubpathManipulatorKey[] = ["set_anchor", "set_in_handle", "set_out_handle"];
 
@@ -156,11 +157,25 @@ export function getSubpathDemoArgs(): SubpathDemoArgs[] {
 			triples: [
 				[[60, 125], undefined, [65, 40]],
 				[[155, 30], [145, 120], undefined],
-				[
-					[170, 150],
-					[200, 90],
-					[95, 185],
-				],
+				[[170, 150], [200, 90], [95, 185]],
+			],
+			closed: true,
+		},
+	];
+}
+
+export function getSubpathPolylineDemoArgs(): SubpathDemoArgs[] {
+	// We use a function to generate a new object each time it is called
+	// to prevent one instance from being shared and modified across demos
+	return [
+		{
+			title: "3+ Points",
+			triples: [
+				[[45, 20], undefined, undefined],
+				[[175, 40], undefined, undefined],
+				[[200, 175], undefined, undefined],
+				[[125, 100], undefined, undefined],
+				[[75, 125], undefined, undefined],
 			],
 			closed: true,
 		},
@@ -238,4 +253,11 @@ export const capOptions = {
 	inputType: "dropdown",
 	default: 0,
 	options: CAP_VARIANTS,
+};
+
+export const boolOptions = {
+	variable: "bool",
+	inputType: "dropdown",
+	default: 0,
+	options: BOOL_VARIANTS,
 };

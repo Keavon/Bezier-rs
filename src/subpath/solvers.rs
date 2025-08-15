@@ -23,11 +23,11 @@ impl<PointId: crate::Identifier> Subpath<PointId> {
 	/// - `minimum_separation`: the minimum difference two adjacent `t`-values must have when comparing adjacent `t`-values in sorted order.
 	///
 	/// If the comparison condition is not satisfied, the function takes the larger `t`-value of the two.
-	/// <iframe frameBorder="0" width="100%" height="375px" src="https://keavon.github.io/Bezier-rs#subpath/intersect-linear/solo" title="Intersection Demo"></iframe>
+	/// <iframe frameBorder="0" width="100%" height="375px" src="https://keavon.github.io/Bezier-rs#subpath/intersect-linear/solo" title="Linear Intersection Demo"></iframe>
 	///
-	/// <iframe frameBorder="0" width="100%" height="375px" src="https://keavon.github.io/Bezier-rs#subpath/intersect-quadratic/solo" title="Intersection Demo"></iframe>
+	/// <iframe frameBorder="0" width="100%" height="375px" src="https://keavon.github.io/Bezier-rs#subpath/intersect-quadratic/solo" title="Quadratic Intersection Demo"></iframe>
 	///
-	/// <iframe frameBorder="0" width="100%" height="375px" src="https://keavon.github.io/Bezier-rs#subpath/intersect-cubic/solo" title="Intersection Demo"></iframe>
+	/// <iframe frameBorder="0" width="100%" height="375px" src="https://keavon.github.io/Bezier-rs#subpath/intersect-cubic/solo" title="Cubic Intersection Demo"></iframe>
 	pub fn intersections(&self, other: &Bezier, error: Option<f64>, minimum_separation: Option<f64>) -> Vec<(usize, f64)> {
 		self.iter()
 			.enumerate()
@@ -111,7 +111,7 @@ impl<PointId: crate::Identifier> Subpath<PointId> {
 	/// If the comparison condition is not satisfied, the function takes the larger `t`-value of the two
 	///
 	/// **NOTE**: if an intersection were to occur within an `error` distance away from an anchor point, the algorithm will filter that intersection out.
-	/// <iframe frameBorder="0" width="100%" height="375px" src="https://keavon.github.io/Bezier-rs#subpath/intersect-self/solo" title="Self-Intersection Demo"></iframe>
+	/// <iframe frameBorder="0" width="100%" height="375px" src="https://keavon.github.io/Bezier-rs#subpath/intersect-self/solo" title="Self Intersection Demo"></iframe>
 	pub fn self_intersections(&self, error: Option<f64>, minimum_separation: Option<f64>) -> Vec<(usize, f64)> {
 		let mut intersections_vec = Vec::new();
 		let err = error.unwrap_or(MAX_ABSOLUTE_DIFFERENCE);
@@ -172,7 +172,7 @@ impl<PointId: crate::Identifier> Subpath<PointId> {
 	/// - `minimum_separation`: the minimum difference two adjacent `t`-values must have when comparing adjacent `t`-values in sorted order.
 	///
 	/// If the comparison condition is not satisfied, the function takes the larger `t`-value of the two.
-	/// <iframe frameBorder="0" width="100%" height="375px" src="https://keavon.github.io/Bezier-rs#subpath/intersect-rectangle/solo" title="Intersection Demo"></iframe>
+	/// <iframe frameBorder="0" width="100%" height="375px" src="https://keavon.github.io/Bezier-rs#subpath/intersect-rectangle/solo" title="Rectangle Intersection Demo"></iframe>
 	pub fn rectangle_intersections(&self, corner1: DVec2, corner2: DVec2, error: Option<f64>, minimum_separation: Option<f64>) -> Vec<(usize, f64)> {
 		[
 			Bezier::from_linear_coordinates(corner1.x, corner1.y, corner2.x, corner1.y),

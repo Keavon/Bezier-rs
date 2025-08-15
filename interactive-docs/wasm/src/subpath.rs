@@ -555,6 +555,18 @@ impl WasmSubpath {
 		wrap_svg_tag(format!("{}{}", self.to_default_svg(), trimmed_subpath_svg))
 	}
 
+	pub fn new_cubic_spline(&self, closed: u32) -> String {
+		let closed = closed != 0;
+
+		let anchors = self.0.iter().map(|bezier| bezier.start()).collect::<Vec<_>>();
+		let subpath = Subpath::<EmptyId>::new_cubic_spline(anchors, closed);
+
+		let mut spline_svg = String::new();
+		subpath.to_svg(&mut spline_svg, CURVE_ATTRIBUTES.to_string().replace(BLACK, RED), String::new(), String::new(), String::new());
+
+		wrap_svg_tag(format!("{}{spline_svg}", self.to_default_svg()))
+	}
+
 	pub fn offset(&self, distance: f64, join: i32, miter_limit: f64) -> String {
 		let join = parse_join(join, miter_limit);
 		let offset_subpath = self.0.offset(distance, join);

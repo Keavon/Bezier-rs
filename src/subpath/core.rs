@@ -383,9 +383,10 @@ impl<PointId: crate::Identifier> Subpath<PointId> {
 		Self::from_anchors([p1, p2], false)
 	}
 
-	/// Construct a cubic spline from a list of points.
+	/// Construct a cubic spline from a list of points, which can be either open or closed.
 	/// Based on <https://mathworld.wolfram.com/CubicSpline.html>.
-	pub fn new_cubic_spline(points: Vec<DVec2>) -> Self {
+	/// <iframe frameBorder="0" width="100%" height="325px" src="https://keavon.github.io/Bezier-rs#subpath/new-cubic-spline/solo" title="New Cubic Spline Demo"></iframe>
+	pub fn new_cubic_spline(points: Vec<DVec2>, closed: bool) -> Self {
 		if points.len() < 2 {
 			return Self::new(Vec::new(), false);
 		}
@@ -393,27 +394,40 @@ impl<PointId: crate::Identifier> Subpath<PointId> {
 		// Number of points = number of points to find handles for
 		let len_points = points.len();
 
-		let out_handles = solve_spline_first_handle_open(&points);
+		if closed {
+			let out_handles = solve_spline_first_handle_closed(&points);
+			if out_handles.is_empty() {
+				return Self::from_anchors(points, false);
+			}
 
-		let mut subpath = Subpath::new(Vec::new(), false);
+			let manipulator_groups = (0..len_points)
+				.map(|i| ManipulatorGroup::new(points[i], Some(2. * points[i] - out_handles[i]), Some(out_handles[i])))
+				.collect();
 
-		// given the second point in the n'th cubic bezier, the third point is given by 2 * points[n+1] - b[n+1].
-		// to find 'handle1_pos' for the n'th point we need the n-1 cubic bezier
-		subpath.manipulator_groups.push(ManipulatorGroup::new(points[0], None, Some(out_handles[0])));
-		for i in 1..len_points - 1 {
+			Subpath::new(manipulator_groups, true)
+		} else {
+			let out_handles = solve_spline_first_handle_open(&points);
+
+			let mut subpath = Subpath::new(Vec::with_capacity(len_points), false);
+
+			// Given the second point in the nth cubic bezier, the third point is given by 2 * points[n+1] - b[n+1].
+			// To find 'handle1_pos' for the nth point we need the n-1 cubic bezier.
+			subpath.manipulator_groups.push(ManipulatorGroup::new(points[0], None, Some(out_handles[0])));
+			for i in 1..len_points - 1 {
+				subpath
+					.manipulator_groups
+					.push(ManipulatorGroup::new(points[i], Some(2. * points[i] - out_handles[i]), Some(out_handles[i])));
+			}
 			subpath
 				.manipulator_groups
-				.push(ManipulatorGroup::new(points[i], Some(2. * points[i] - out_handles[i]), Some(out_handles[i])));
-		}
-		subpath
-			.manipulator_groups
-			.push(ManipulatorGroup::new(points[len_points - 1], Some(2. * points[len_points - 1] - out_handles[len_points - 1]), None));
+				.push(ManipulatorGroup::new(points[len_points - 1], Some(2. * points[len_points - 1] - out_handles[len_points - 1]), None));
 
-		subpath
+			subpath
+		}
 	}
 
 	#[cfg(feature = "kurbo")]
-	pub fn to_vello_path(&self, transform: glam::DAffine2, path: &mut kurbo::BezPath) {
+	pub fn to_kurbo_path(&self, transform: glam::DAffine2, path: &mut kurbo::BezPath) {
 		use crate::BezierHandles;
 
 		let to_point = |p: DVec2| {
@@ -435,7 +449,7 @@ impl<PointId: crate::Identifier> Subpath<PointId> {
 }
 
 /// Solve for the first handle of an open spline. (The opposite handle can be found by mirroring the result about the anchor.)
-pub fn solve_spline_first_handle_open(points: &[DVec2]) -> Vec<DVec2> {
+fn solve_spline_first_handle_open(points: &[DVec2]) -> Vec<DVec2> {
 	let len_points = points.len();
 	if len_points == 0 {
 		return Vec::new();
@@ -492,7 +506,7 @@ pub fn solve_spline_first_handle_open(points: &[DVec2]) -> Vec<DVec2> {
 
 /// Solve for the first handle of a closed spline. (The opposite handle can be found by mirroring the result about the anchor.)
 /// If called with fewer than 3 points, this function will return an empty result.
-pub fn solve_spline_first_handle_closed(points: &[DVec2]) -> Vec<DVec2> {
+fn solve_spline_first_handle_closed(points: &[DVec2]) -> Vec<DVec2> {
 	let len_points = points.len();
 	if len_points < 3 {
 		return Vec::new();

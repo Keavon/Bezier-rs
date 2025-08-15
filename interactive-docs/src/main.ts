@@ -4,7 +4,7 @@ import type { BezierFeatureKey, BezierFeatureOptions } from "@/features-bezier";
 import subpathFeatures from "@/features-subpath";
 import type { SubpathFeatureKey, SubpathFeatureOptions } from "@/features-subpath";
 import type { DemoArgs, BezierCurveType, BezierDemoArgs, SubpathDemoArgs, DemoData, WasmSubpathInstance, WasmSubpathManipulatorKey, InputOption, DemoDataBezier, DemoDataSubpath } from "@/types";
-import { BEZIER_CURVE_TYPE, getBezierDemoPointDefaults, getSubpathDemoArgs, POINT_INDEX_TO_MANIPULATOR, getConstructorKey, getCurveType, MANIPULATOR_KEYS_FROM_BEZIER_TYPE } from "@/types";
+import { BEZIER_CURVE_TYPE, getBezierDemoPointDefaults, getSubpathDemoArgs, getSubpathPolylineDemoArgs, POINT_INDEX_TO_MANIPULATOR, getConstructorKey, getCurveType, MANIPULATOR_KEYS_FROM_BEZIER_TYPE } from "@/types";
 
 init().then(renderPage);
 
@@ -97,7 +97,7 @@ function subpathDemoGroup(key: SubpathFeatureKey, options: SubpathFeatureOptions
 		}));
 		return demoSubpath(demo.title, demo.triples, key, demo.closed, newInputOptions, options.triggerOnMouseMove || false);
 	};
-	return renderDemoGroup(`subpath/${key}`, subpathFeatures[key].name, getSubpathDemoArgs(), buildDemo);
+	return renderDemoGroup(`subpath/${key}`, subpathFeatures[key].name, key === "new-cubic-spline" ? getSubpathPolylineDemoArgs() : getSubpathDemoArgs(), buildDemo);
 }
 
 function demoBezier(title: string, points: number[][], key: BezierFeatureKey, inputOptions: InputOption[], triggerOnMouseMove: boolean): DemoDataBezier {
