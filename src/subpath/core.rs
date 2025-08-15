@@ -8,6 +8,7 @@ use std::fmt::Write;
 impl<PointId: crate::Identifier> Subpath<PointId> {
 	/// Create a new `Subpath` using a list of [ManipulatorGroup]s.
 	/// A `Subpath` with less than 2 [ManipulatorGroup]s may not be closed.
+	/// <iframe frameBorder="0" width="100%" height="275px" src="https://keavon.github.io/Bezier-rs#subpath/constructor/solo" title="Constructor Demo"></iframe>
 	#[track_caller]
 	pub fn new(manipulator_groups: Vec<ManipulatorGroup<PointId>>, closed: bool) -> Self {
 		assert!(!closed || !manipulator_groups.is_empty(), "A closed Subpath must contain more than 0 ManipulatorGroups.");

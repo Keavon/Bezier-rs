@@ -389,6 +389,7 @@ impl<PointId: crate::Identifier> Subpath<PointId> {
 	///
 	/// While the conceptual process described above asymptotically slows down and is never guaranteed to produce a maximal set in finite time,
 	/// this is implemented with an algorithm that produces a maximal set in O(n) time. The slowest part is actually checking if points are inside the subpath shape.
+	/// <iframe frameBorder="0" width="100%" height="325px" src="https://keavon.github.io/Bezier-rs#subpath/poisson-disk-points/solo" title="Poisson-Disk Points Demo"></iframe>
 	pub fn poisson_disk_points(&self, separation_disk_diameter: f64, rng: impl FnMut() -> f64) -> Vec<DVec2> {
 		let Some(bb) = self.bounding_box() else { return Vec::new() };
 		let (offset_x, offset_y) = bb[0].into();

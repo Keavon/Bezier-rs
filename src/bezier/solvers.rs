@@ -370,7 +370,9 @@ impl Bezier {
 	/// If the provided curve is linear, then zero intersection points will be returned along colinear segments.
 	/// - `error` - For intersections where the provided bezier is non-linear, `error` defines the threshold for bounding boxes to be considered an intersection point.
 	/// - `minimum_separation` - The minimum difference between adjacent `t` values in sorted order
-	/// <iframe frameBorder="0" width="100%" height="375px" src="https://keavon.github.io/Bezier-rs#bezier/intersect-cubic/solo" title="Intersections Demo"></iframe>
+	/// <iframe frameBorder="0" width="100%" height="275px" src="https://keavon.github.io/Bezier-rs#bezier/intersect-linear/solo" title="Linear Intersections Demo"></iframe>
+	/// <iframe frameBorder="0" width="100%" height="350px" src="https://keavon.github.io/Bezier-rs#bezier/intersect-quadratic/solo" title="Quadratic Intersections Demo"></iframe>
+	/// <iframe frameBorder="0" width="100%" height="350px" src="https://keavon.github.io/Bezier-rs#bezier/intersect-cubic/solo" title="Cubic Intersections Demo"></iframe>
 	pub fn intersections(&self, other: &Bezier, error: Option<f64>, minimum_separation: Option<f64>) -> Vec<f64> {
 		// TODO: Consider using the `intersections_between_vectors_of_curves` helper function here
 		// Otherwise, use bounding box to determine intersections

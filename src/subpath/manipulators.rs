@@ -53,6 +53,7 @@ impl<PointId: crate::Identifier> Subpath<PointId> {
 
 	/// Inserts a `ManipulatorGroup` at a certain point along the subpath based on the parametric `t`-value provided.
 	/// Expects `t` to be within the inclusive range `[0, 1]`.
+	/// <iframe frameBorder="0" width="100%" height="350px" src="https://keavon.github.io/Bezier-rs#subpath/insert/solo" title="Insert Demo"></iframe>
 	pub fn insert(&mut self, t: SubpathTValue) {
 		let (segment_index, t) = self.t_value_to_parametric(t);
 

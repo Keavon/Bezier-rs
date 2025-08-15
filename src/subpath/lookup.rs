@@ -69,6 +69,7 @@ impl<PointId: crate::Identifier> Subpath<PointId> {
 	/// If the comparison condition is not satisfied, the function takes the larger `t`-value of the two
 	///
 	/// **NOTE**: if an intersection were to occur within an `error` distance away from an anchor point, the algorithm will filter that intersection out.
+	/// <iframe frameBorder="0" width="100%" height="350px" src="https://keavon.github.io/Bezier-rs#subpath/area/solo" title="Area Demo"></iframe>
 	pub fn area(&self, error: Option<f64>, minimum_separation: Option<f64>) -> f64 {
 		let all_intersections = self.all_self_intersections(error, minimum_separation);
 		let mut current_sign: f64 = 1.;
