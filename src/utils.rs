@@ -291,11 +291,11 @@ pub fn compute_circular_subpath_details<PointId: crate::Identifier>(left: DVec2,
 }
 
 pub fn format_point(svg: &mut String, prefix: &str, x: f64, y: f64) -> std::fmt::Result {
-	write!(svg, "{prefix}{:.6}", x)?;
+	write!(svg, "{prefix}{x:.6}")?;
 	let trimmed_length = svg.trim_end_matches('0').trim_end_matches('.').len();
 	svg.truncate(trimmed_length);
 
-	write!(svg, ",{:.6}", y)?;
+	write!(svg, ",{y:.6}")?;
 	let trimmed_length = svg.trim_end_matches('0').trim_end_matches('.').len();
 	svg.truncate(trimmed_length);
 

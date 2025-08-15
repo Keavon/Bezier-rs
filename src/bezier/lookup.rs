@@ -10,7 +10,7 @@ impl Bezier {
 	}
 
 	/// Convert a euclidean distance ratio along the `Bezier` curve to a parametric `t`-value.
-	/// For performance reasons, this version of the [`euclidean_to_parametric`] function allows the caller to
+	/// For performance reasons, this version of the [`Self::euclidean_to_parametric`] function allows the caller to
 	/// provide the total length of the curve so it doesn't have to be calculated every time the function is called.
 	pub fn euclidean_to_parametric_with_total_length(&self, euclidean_t: f64, error: f64, total_length: f64) -> f64 {
 		if euclidean_t < error {
