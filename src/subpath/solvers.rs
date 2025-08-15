@@ -472,7 +472,7 @@ impl<PointId: crate::Identifier> Subpath<PointId> {
 			// Draw the miter join if the intersection occurs in the correct direction with respect to the path
 			if start_to_intersection.normalize().abs_diff_eq(in_tangent, MAX_ABSOLUTE_DIFFERENCE)
 				&& intersection_to_end.normalize().abs_diff_eq(out_tangent, MAX_ABSOLUTE_DIFFERENCE)
-				&& miter_limit > f64::EPSILON / (start_to_intersection.angle_to(-intersection_to_end).abs() / 2.).sin()
+				&& miter_limit > 1. / (start_to_intersection.angle_to(-intersection_to_end).abs() / 2.).sin()
 			{
 				return Some(ManipulatorGroup {
 					anchor: intersection,
