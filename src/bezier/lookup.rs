@@ -4,9 +4,24 @@ use crate::utils::{TValue, TValueType};
 /// Functionality relating to looking up properties of the `Bezier` or points along the `Bezier`.
 impl Bezier {
 	/// Convert a euclidean distance ratio along the `Bezier` curve to a parametric `t`-value.
+	/// This is the inverse of [`Self::parametric_to_euclidean`].
 	pub fn euclidean_to_parametric(&self, ratio: f64, error: f64) -> f64 {
 		let total_length = self.length(None);
 		self.euclidean_to_parametric_with_total_length(ratio, error, total_length)
+	}
+
+	/// Convert a parametric `t`-value to a euclidean distance ratio along the `Bezier` curve.
+	/// This is the inverse of [`Self::euclidean_to_parametric`].
+	pub fn parametric_to_euclidean(&self, t: f64) -> f64 {
+		if t <= 0. {
+			return 0.;
+		}
+		if t >= 1. {
+			return 1.;
+		}
+
+		let [start, end] = self.split(TValue::Parametric(t)).map(|bezier| bezier.length(None));
+		(start / (start + end)).clamp(0., 1.)
 	}
 
 	/// Convert a euclidean distance ratio along the `Bezier` curve to a parametric `t`-value.
