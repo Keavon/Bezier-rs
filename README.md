@@ -1,22 +1,26 @@
-[crates.io](https://crates.io/crates/bezier-rs) • [docs.rs](https://docs.rs/bezier-rs/latest/bezier_rs/) • [repo](https://github.com/Keavon/Bezier-rs)
+[repo](https://github.com/Keavon/Bezier-rs) • [crates.io](https://crates.io/crates/bezier-rs) • [docs.rs](https://docs.rs/bezier-rs/latest/bezier_rs/) • [interactive docs](https://keavon.github.io/Bezier-rs/)
 
 # Bezier-rs
 
-Computational geometry algorithms for Bézier segments and shapes useful in the context of 2D graphics.
+Computational geometry algorithms for Bézier segments and paths useful in the context of 2D graphics.
 
-Play with the interactive documentation which visualizes each API function in a fun manner:
+Play with the interactive documentation which visualizes each API function in a fun, graphical manner:
 
 ### [**View the interactive API**](https://keavon.github.io/Bezier-rs/)
 
 ---
 
-Bezier-rs is built for the needs of [Graphite](https://github.com/GraphiteEditor/Graphite), an open source 2D vector graphics editor. We hope it may be useful to others, but presently Graphite is its primary user. Pull requests are welcomed for new features, code cleanup, ergonomic enhancements, performance improvements, and documentation clarifications.
+## Deprecation Notice
 
-The library currently provides functions dealing with single Bézier curve segments and open-or-closed multi-segment paths (which we call _subpaths_).
+Bezier-rs was built for the needs of [Graphite](https://github.com/GraphiteEditor/Graphite), an open source 2D graphics editor. The library is now deprecated and has been archived in this repository by extracting its development history from Graphite's monorepo, with some cleanup in support of its standalone archival.
 
-In the future, the library will be expanded to include compound paths (multiple subpaths forming a single shape, where the winding order determines inside-or-outside-ness) and operations between paths (e.g. boolean operations, convex hull). Pull requests for these additional features would be highly desirable.
+Graphite has moved to [Kurbo](https://github.com/linebender/kurbo) as of 2025, which offers superior performance and correctness compared to the naïve and unoptimized algorithms implemented here. However, some algorithms offered by Bezier-rs are not yet available in Kurbo. Note also that Bezier-rs is anchor-centric while Kurbo (like SVG) is segment-centric, meaning paths in Bezier-rs are defined by their anchor points and incoming/outgoing handles, while Kurbo paths are defined by segment commands like move-to, line-to, quadratic-to, and cubic-to.
 
-Bezier-rs is inspired by [Bezier.js](https://pomax.github.io/bezierjs/) and [_A Primer on Bézier Curves_](https://pomax.github.io/bezierinfo/) by Pomax. Bezier-rs is not a port of Bezier.js so the API for single-segment Bézier curves has some differences, and the intention is to offer a broader scope that provides algorithms beyond single curve segments (as noted above) to eventually service full vector shapes.
+No further development will continue and 0.5 is the last major version. Interested contributors are encouraged to submit missing algorithms to Kurbo instead.
+
+## Features
+
+Bezier-rs is inspired by [Bezier.js](https://pomax.github.io/bezierjs/) and [_A Primer on Bézier Curves_](https://pomax.github.io/bezierinfo/) by Pomax. It is not a port, so its API differs and additionally covers paths, not only single Bézier segments. View the [interactive documentation](https://keavon.github.io/Bezier-rs/) or the [docs.rs](https://docs.rs/bezier-rs/latest/bezier_rs/) documentation for more feature details.
 
 ## Terminology
 
